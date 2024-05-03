@@ -45,6 +45,10 @@ export default {
       name: 'TransactionController',
       path: '../controllers/transactionController',
     },
+    total: {
+      name: 'TotalController',
+      path: '../controllers/totalController',
+    },
   },
 
   repos: {
@@ -52,12 +56,20 @@ export default {
       name: 'TransactionRepo',
       path: '../repos/transactionRepo',
     },
+    total: {
+      name: 'TotalRepo',
+      path: '../repos/totalRepo',
+    },
   },
 
   services: {
     transaction: {
       name: 'TransactionService',
       path: '../services/transactionService',
+    },
+    total: {
+      name: 'TotalService',
+      path: '../services/totalService',
     },
   },
 };

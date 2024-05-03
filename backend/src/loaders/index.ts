@@ -17,8 +17,17 @@ export default async ({ expressApp }) => {
     schema: '../persistence/schemas/transactionSchema',
   };
 
+  const totalSchema = {
+    name: 'totalSchema',
+    schema: '../persistence/schemas/totalSchema',
+  };
 
 
+
+  const totalController = {
+    name: config.controllers.total.name,
+    path: config.controllers.total.path,
+  };
 
   const transactionController = {
     name: config.controllers.transaction.name,
@@ -32,6 +41,11 @@ export default async ({ expressApp }) => {
     path: config.repos.transaction.path,
   };
 
+  const totalRepo = {
+    name: config.repos.total.name,
+    path: config.repos.total.path,
+  };
+
 
 
   const transactionService = {
@@ -39,12 +53,17 @@ export default async ({ expressApp }) => {
     path: config.services.transaction.path,
   };
 
+  const totalService = {
+    name: config.services.total.name,
+    path: config.services.total.path,
+  };
+
   await dependencyInjectorLoader({
     mongoConnection,
-    schemas: [transactionSchema],
-    controllers: [transactionController],
-    repos: [transactionRepo],
-    services: [transactionService],
+    schemas: [transactionSchema, totalSchema],
+    controllers: [transactionController, totalController],
+    repos: [transactionRepo, totalRepo],
+    services: [transactionService, totalService],
   });
   Logger.info('✌️ Schemas, Controllers, Repositories, Services, etc. loaded');
 

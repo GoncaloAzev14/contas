@@ -1,21 +1,51 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
-const BASE_API_URL = 'http://localhost:4000/api/transaction'; // Update this URL to match your backend server URL
+const BASE_API_URL = 'http://localhost:4000/api/'; // Update this URL to match your backend server URL
 
 function App() {
     const [totalValue, setTotalValue] = useState(0);
     const [expenses, setExpenses] = useState([]);
+    const [id, setId] = useState(null);
 
-    // Fetch transactions from the backend when the component mounts 
+    // Fetch total from the database when the component mounts 
+    useEffect(() => {
+        const fetchTotal = async () => {
+            try {
+                const response = await fetch(BASE_API_URL + 'total');
+                const data = await response.json();
+                setId(data[0].id);
+                // console.log("DATA.ID: " + data[0].id)
+    
+                // Verifica se `data` é um array e se contém exatamente um objeto
+                if (Array.isArray(data) && data.length === 1) {
+                    const [total] = data; // Extrai o primeiro objeto do array
+                    setTotalValue(total.value); // Assume que `total` possui uma propriedade `value`
+                } else {
+                    console.error('Resposta inesperada da API: ', data);
+                    // Caso contrário, defina `totalValue` como 0 ou um valor padrão
+                    setTotalValue(0);
+                }
+            } catch (error) {
+                console.error('Erro ao buscar o total:', error);
+            }
+        };
+    
+        fetchTotal();
+    }, []);
+
+    // console.log("TOTAL VALUE: " + totalValue)
+    // console.log("ID: " + id)
+    
+    
+
+    // Fetch transactions from the database when the component mounts 
     useEffect(() => {
         const fetchTransactions = async () => {
             try {
-                const response = await fetch(BASE_API_URL);
+                const response = await fetch(BASE_API_URL + 'transaction');
                 const data = await response.json();
                 setExpenses(data); // Update expenses based on data from the backend
-                const total = data.reduce((sum, transaction) => sum + transaction.value, 0);
-                setTotalValue(total); // Calculate the total value from transactions
             } catch (error) {
                 console.error('Error fetching transactions:', error);
             }
@@ -24,10 +54,32 @@ function App() {
         fetchTransactions();
     }, []);
 
+    const updateTotalValue = async (newTotalValue) => {
+        try {
+            const response = await fetch(BASE_API_URL + 'total', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ id: id, value: newTotalValue }), // Envia o novo valor total como JSON
+            });
+    
+            if (response.ok) {
+                // Atualize `totalValue` no estado com o novo valor
+                setTotalValue(newTotalValue);
+            } else {
+                console.error('Erro ao atualizar o total:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Erro ao atualizar o total:', error);
+        }
+    };
+    
+
     // Create a new transaction (either expense or balance) and update state
     const createTransaction = async (transactionData) => {
         try {
-            const response = await fetch(BASE_API_URL, {
+            const response = await fetch(BASE_API_URL + 'transaction', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -40,6 +92,7 @@ function App() {
                 // Update state with the new transaction
                 setExpenses((prevExpenses) => [...prevExpenses, newTransaction]);
                 setTotalValue((prevTotal) => prevTotal + newTransaction.value);
+                updateTotalValue(newTransaction.value + totalValue)
             } else {
                 console.error('Error creating transaction:', response.statusText);
             }
@@ -73,6 +126,7 @@ function App() {
     const handleChangeTotal = (value) => {
         if (value >= 0) {
             setTotalValue(value);
+            updateTotalValue(value);
             // Optional: Add logic to handle updating the total on the backend if necessary.
         }
     };
