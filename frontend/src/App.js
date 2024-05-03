@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
-const BASE_API_URL = 'http://localhost:4000/api/'; // Update this URL to match your backend server URL
+const BASE_API_URL = 'http://localhost:4000/api/'; // Atualize essa URL para corresponder à sua API
 
 function App() {
     const [totalValue, setTotalValue] = useState(0);
@@ -14,30 +14,23 @@ function App() {
             try {
                 const response = await fetch(BASE_API_URL + 'total');
                 const data = await response.json();
-                setId(data[0].id);
-                // console.log("DATA.ID: " + data[0].id)
-    
+
                 // Verifica se `data` é um array e se contém exatamente um objeto
                 if (Array.isArray(data) && data.length === 1) {
                     const [total] = data; // Extrai o primeiro objeto do array
+                    setId(total.id); // Assume que `total` possui uma propriedade `id`
                     setTotalValue(total.value); // Assume que `total` possui uma propriedade `value`
                 } else {
-                    console.error('Resposta inesperada da API: ', data);
-                    // Caso contrário, defina `totalValue` como 0 ou um valor padrão
-                    setTotalValue(0);
+                    console.error('Resposta inesperada da API:', data);
+                    setTotalValue(0); // Define `totalValue` como 0 se a resposta for inesperada
                 }
             } catch (error) {
                 console.error('Erro ao buscar o total:', error);
             }
         };
-    
+
         fetchTotal();
     }, []);
-
-    // console.log("TOTAL VALUE: " + totalValue)
-    // console.log("ID: " + id)
-    
-    
 
     // Fetch transactions from the database when the component mounts 
     useEffect(() => {
@@ -45,9 +38,9 @@ function App() {
             try {
                 const response = await fetch(BASE_API_URL + 'transaction');
                 const data = await response.json();
-                setExpenses(data); // Update expenses based on data from the backend
+                setExpenses(data); // Atualiza `expenses` com os dados do backend
             } catch (error) {
-                console.error('Error fetching transactions:', error);
+                console.error('Erro ao buscar transações:', error);
             }
         };
 
@@ -63,9 +56,9 @@ function App() {
                 },
                 body: JSON.stringify({ id: id, value: newTotalValue }), // Envia o novo valor total como JSON
             });
-    
+
             if (response.ok) {
-                // Atualize `totalValue` no estado com o novo valor
+                // Atualiza `totalValue` com o novo valor
                 setTotalValue(newTotalValue);
             } else {
                 console.error('Erro ao atualizar o total:', response.statusText);
@@ -74,7 +67,6 @@ function App() {
             console.error('Erro ao atualizar o total:', error);
         }
     };
-    
 
     // Create a new transaction (either expense or balance) and update state
     const createTransaction = async (transactionData) => {
@@ -89,45 +81,47 @@ function App() {
 
             if (response.ok) {
                 const newTransaction = await response.json();
-                // Update state with the new transaction
+                // Atualiza `expenses` com a nova transação
                 setExpenses((prevExpenses) => [...prevExpenses, newTransaction]);
-                setTotalValue((prevTotal) => prevTotal + newTransaction.value);
-                updateTotalValue(newTransaction.value + totalValue)
+                // Atualiza `totalValue` com o novo total
+                const newTotal = totalValue + newTransaction.value;
+                setTotalValue(newTotal);
+                // Atualiza o total na base de dados
+                await updateTotalValue(newTotal);
             } else {
-                console.error('Error creating transaction:', response.statusText);
+                console.error('Erro ao criar transação:', response.statusText);
             }
         } catch (error) {
-            console.error('Error creating transaction:', error);
+            console.error('Erro ao criar transação:', error);
         }
     };
 
-    const handleAddExpense = (expenseValue, description) => {
+    const handleAddExpense = (expenseValue, description, date) => {
         if (expenseValue > 0) {
             const transactionData = {
                 value: -expenseValue,
-                date: new Date().toISOString(),
-                description, // Use the provided description
+                date: date || new Date().toISOString(), // Usa a data escolhida ou a data atual como padrão
+                description: description || 'Despesa',
             };
             createTransaction(transactionData);
         }
     };
 
-    const handleAddBalance = (addValue, description) => {
+    const handleAddBalance = (addValue, description, date) => {
         if (addValue > 0) {
             const transactionData = {
-                value: +addValue,
-                date: new Date().toISOString(),
-                description, // Use the provided description
+                value: addValue,
+                date: date || new Date().toISOString(), // Usa a data escolhida ou a data atual como padrão
+                description: description || 'Crédito',
             };
             createTransaction(transactionData);
         }
     };
 
-    const handleChangeTotal = (value) => {
+    const handleChangeTotal = async (value) => {
         if (value >= 0) {
-            setTotalValue(value);
-            updateTotalValue(value);
-            // Optional: Add logic to handle updating the total on the backend if necessary.
+            // Atualiza `totalValue` e o total na base de dados
+            await updateTotalValue(value);
         }
     };
 
@@ -152,14 +146,16 @@ function App() {
 function ExpenseInput({ onAddExpense }) {
     const [expenseValue, setExpenseValue] = useState('');
     const [description, setDescription] = useState('');
+    const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
 
     const handleSubmit = (event) => {
         event.preventDefault();
         const value = parseFloat(expenseValue);
         if (value > 0) {
-            onAddExpense(value, description);
+            onAddExpense(value, description, date);
             setExpenseValue('');
             setDescription('');
+            setDate(new Date().toISOString().slice(0, 10)); // Redefine a data para a data atual
         }
     };
 
@@ -170,13 +166,19 @@ function ExpenseInput({ onAddExpense }) {
                 id="expense"
                 value={expenseValue}
                 onChange={(event) => setExpenseValue(event.target.value)}
+                placeholder="Valor da despesa"
             />
             <input
                 type="text"
                 id="description"
                 value={description}
                 onChange={(event) => setDescription(event.target.value)}
-                placeholder="Descrição de débito"
+                placeholder="Descrição da despesa"
+            />
+            <input
+                type="date"
+                value={date}
+                onChange={(event) => setDate(event.target.value)}
             />
             <button type="submit">Adicionar Débito</button>
         </form>
@@ -186,14 +188,16 @@ function ExpenseInput({ onAddExpense }) {
 function BalanceInput({ onAddBalance }) {
     const [addValue, setAddValue] = useState('');
     const [description, setDescription] = useState('');
+    const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
 
     const handleSubmit = (event) => {
         event.preventDefault();
         const value = parseFloat(addValue);
         if (value > 0) {
-            onAddBalance(value, description);
+            onAddBalance(value, description, date);
             setAddValue('');
             setDescription('');
+            setDate(new Date().toISOString().slice(0, 10)); // Redefine a data para a data atual
         }
     };
 
@@ -204,13 +208,19 @@ function BalanceInput({ onAddBalance }) {
                 id="balance"
                 value={addValue}
                 onChange={(event) => setAddValue(event.target.value)}
+                placeholder="Valor do crédito"
             />
             <input
                 type="text"
                 id="description"
                 value={description}
                 onChange={(event) => setDescription(event.target.value)}
-                placeholder="Descrição de crédito"
+                placeholder="Descrição do crédito"
+            />
+            <input
+                type="date"
+                value={date}
+                onChange={(event) => setDate(event.target.value)}
             />
             <button type="submit">Adicionar Crédito</button>
         </form>
@@ -218,14 +228,14 @@ function BalanceInput({ onAddBalance }) {
 }
 
 function ChangeTotal({ onChangeTotal }) {
-    const [value, setTotalValue] = useState('');
+    const [value, setValue] = useState('');
 
     const handleSubmit = (event) => {
         event.preventDefault();
         const newValue = parseFloat(value);
         if (newValue >= 0) {
             onChangeTotal(newValue);
-            setTotalValue('');
+            setValue('');
         }
     };
 
@@ -235,7 +245,8 @@ function ChangeTotal({ onChangeTotal }) {
                 type="number"
                 id="total"
                 value={value}
-                onChange={(event) => setTotalValue(event.target.value)}
+                onChange={(event) => setValue(event.target.value)}
+                placeholder="Novo valor total"
             />
             <button type="submit">Alterar Total</button>
         </form>
