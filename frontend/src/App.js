@@ -176,7 +176,7 @@ function ExpenseInput({ onAddExpense }) {
                 id="description"
                 value={description}
                 onChange={(event) => setDescription(event.target.value)}
-                placeholder="Descrição da despesa"
+                placeholder="Descrição de débito"
             />
             <button type="submit">Adicionar Débito</button>
         </form>
@@ -210,7 +210,7 @@ function BalanceInput({ onAddBalance }) {
                 id="description"
                 value={description}
                 onChange={(event) => setDescription(event.target.value)}
-                placeholder="Descrição do crédito"
+                placeholder="Descrição de crédito"
             />
             <button type="submit">Adicionar Crédito</button>
         </form>

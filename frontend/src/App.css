@@ -60,6 +60,60 @@ body {
   cursor: pointer;
 }
 
+.balance-form {
+  display: flex; /* Flexbox for horizontal layout */
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.balance-form label {
+  margin-right: 10px;
+  flex: 1;
+}
+
+.balance-form input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  flex: 2;
+}
+
+.balance-form button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #4CAF50; /* Green */
+  color: white;
+  cursor: pointer;
+}
+
+.change-total-form {
+  display: flex; /* Flexbox for horizontal layout */
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.change-total-form label {
+  margin-right: 10px;
+  flex: 1;
+}
+
+.change-total-form input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  flex: 2;
+}
+
+.change-total-form button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #4CAF50; /* Green */
+  color: white;
+  cursor: pointer;
+}
+
 /* Expenses List */
 .expenses-list {
   list-style: none;
