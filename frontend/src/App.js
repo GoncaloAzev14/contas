@@ -1,5 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
+import ExpensesList from './ExpensesList';
+import BalanceInput from './BalanceInput';
+import ChangeTotal from './ChangeTotal';
+import ExpenseInput from './ExpenseInput';
 
 const BASE_API_URL = 'http://localhost:4000/api/'; // Atualize essa URL para corresponder à sua API
 
@@ -101,7 +105,7 @@ function App() {
             const transactionData = {
                 value: -expenseValue,
                 date: date || new Date().toISOString(), // Usa a data escolhida ou a data atual como padrão
-                description: description || 'Despesa',
+                description: description || 'Débito',
             };
             createTransaction(transactionData);
         }
@@ -125,6 +129,29 @@ function App() {
         }
     };
 
+    const handleUpdateTransaction = async (updatedTransaction) => {
+        try {
+            const response = await fetch(BASE_API_URL + 'transaction/', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({id: updatedTransaction.id, value: updatedTransaction.value, date: updatedTransaction.date, description: updatedTransaction.description}),
+            });
+
+            if (response.ok) {
+                const updatedExpenses = expenses.map((expense) =>
+                    expense.id === updatedTransaction.id ? updatedTransaction : expense
+                );
+                setExpenses(updatedExpenses);
+            } else {
+                console.error('Error updating transaction:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Error updating transaction:', error);
+        }
+    };
+
     return (
         <div className="app-container">
             <div className="total-display">
@@ -138,130 +165,8 @@ function App() {
 
             <ChangeTotal onChangeTotal={handleChangeTotal} />
 
-            <ExpensesList expenses={expenses} />
+            <ExpensesList expenses={expenses} onUpdateTransaction={handleUpdateTransaction} />
         </div>
-    );
-}
-
-function ExpenseInput({ onAddExpense }) {
-    const [expenseValue, setExpenseValue] = useState('');
-    const [description, setDescription] = useState('');
-    const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
-
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        const value = parseFloat(expenseValue);
-        if (value > 0) {
-            onAddExpense(value, description, date);
-            setExpenseValue('');
-            setDescription('');
-            setDate(new Date().toISOString().slice(0, 10)); // Redefine a data para a data atual
-        }
-    };
-
-    return (
-        <form className="expense-form" onSubmit={handleSubmit}>
-            <input
-                type="number"
-                id="expense"
-                value={expenseValue}
-                onChange={(event) => setExpenseValue(event.target.value)}
-                placeholder="Valor da despesa"
-            />
-            <input
-                type="text"
-                id="description"
-                value={description}
-                onChange={(event) => setDescription(event.target.value)}
-                placeholder="Descrição da despesa"
-            />
-            <input
-                type="date"
-                value={date}
-                onChange={(event) => setDate(event.target.value)}
-            />
-            <button type="submit">Adicionar Débito</button>
-        </form>
-    );
-}
-
-function BalanceInput({ onAddBalance }) {
-    const [addValue, setAddValue] = useState('');
-    const [description, setDescription] = useState('');
-    const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
-
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        const value = parseFloat(addValue);
-        if (value > 0) {
-            onAddBalance(value, description, date);
-            setAddValue('');
-            setDescription('');
-            setDate(new Date().toISOString().slice(0, 10)); // Redefine a data para a data atual
-        }
-    };
-
-    return (
-        <form className="balance-form" onSubmit={handleSubmit}>
-            <input
-                type="number"
-                id="balance"
-                value={addValue}
-                onChange={(event) => setAddValue(event.target.value)}
-                placeholder="Valor do crédito"
-            />
-            <input
-                type="text"
-                id="description"
-                value={description}
-                onChange={(event) => setDescription(event.target.value)}
-                placeholder="Descrição do crédito"
-            />
-            <input
-                type="date"
-                value={date}
-                onChange={(event) => setDate(event.target.value)}
-            />
-            <button type="submit">Adicionar Crédito</button>
-        </form>
-    );
-}
-
-function ChangeTotal({ onChangeTotal }) {
-    const [value, setValue] = useState('');
-
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        const newValue = parseFloat(value);
-        if (newValue >= 0) {
-            onChangeTotal(newValue);
-            setValue('');
-        }
-    };
-
-    return (
-        <form className="change-total-form" onSubmit={handleSubmit}>
-            <input
-                type="number"
-                id="total"
-                value={value}
-                onChange={(event) => setValue(event.target.value)}
-                placeholder="Novo valor total"
-            />
-            <button type="submit">Alterar Total</button>
-        </form>
-    );
-}
-
-function ExpensesList({ expenses }) {
-    return (
-        <ul className="expenses-list">
-            {expenses.map((expense, index) => (
-                <li key={index}>
-                    {expense.value.toFixed(2)} - {expense.description} on {new Date(expense.date).toLocaleDateString()}
-                </li>
-            ))}
-        </ul>
     );
 }
 

@@ -1,5 +1,5 @@
 export interface ITransactionPersistence {
-  domainId: string;
+  id: string;
   value: number;
   date: Date;
   description: string;

@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Service, Inject } from 'typedi';
 import config from '../../config';
 import ITransactionDTO from '../dto/ITransactionDTO';
@@ -52,7 +53,10 @@ export default class TransactionService implements ITransactionService {
       if (transaction === null) {
         return Result.fail<ITransactionDTO>('Transaction not found');
       } else {
-        transaction.description = transactionDTO.description;
+        if (transactionDTO.description != null) transaction.description = transactionDTO.description;
+        if (transactionDTO.date != null) transaction.date = transactionDTO.date;
+        if (transactionDTO.value != null) transaction.value = transactionDTO.value;
+
         await this.transactionRepo.save(transaction);
 
         const transactionDTOResult = TransactionMap.toDTO(transaction) as ITransactionDTO;

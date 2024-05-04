@@ -50,7 +50,7 @@ export class Transaction extends AggregateRoot<TransactionProps> {
 
   public static create(props: TransactionProps, id?: UniqueEntityID): Result<Transaction> {
     const guardedProps = [
-      { argument: props.value, argumentName: 'Name' },
+      { argument: props.value, argumentName: 'Value' },
       { argument: props.date, argumentName: 'Date' },
       { argument: props.description, argumentName: 'Description' },
     ];

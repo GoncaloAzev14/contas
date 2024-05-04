@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Service, Inject } from 'typedi';
@@ -25,7 +26,7 @@ export default class TransactionRepo implements ITransactionRepo {
   public async exists(transaction: Transaction): Promise<boolean> {
     const idX = transaction.id instanceof TransactionId ? (<TransactionId>transaction.id).toValue() : transaction.id;
 
-    const query = { domainId: idX };
+    const query = { id: idX };
     const transactionDocument = await this.transactionSchema.findOne(
       query as FilterQuery<ITransactionPersistence & Document>,
     );
@@ -34,8 +35,7 @@ export default class TransactionRepo implements ITransactionRepo {
   }
 
   public async save(transaction: Transaction): Promise<Transaction> {
-    const query = { domainId: transaction.id.toString() };
-
+    const query = { id: transaction.id.toString() };
     const transactionDocument = await this.transactionSchema.findOne(query);
 
     try {
@@ -59,7 +59,7 @@ export default class TransactionRepo implements ITransactionRepo {
   }
 
   public async findByDomainId(transactionId: TransactionId | string): Promise<Transaction> {
-    const query = { domainId: transactionId };
+    const query = { id: transactionId };
     const transactionRecord = await this.transactionSchema.findOne(
       query as FilterQuery<ITransactionPersistence & Document>,
     );

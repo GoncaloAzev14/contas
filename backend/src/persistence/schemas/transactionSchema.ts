@@ -3,10 +3,10 @@ import mongoose from 'mongoose';
 
 const TransactionSchema = new mongoose.Schema(
   {
-    domainId: { type: String, unique: true },
-    value: { type: Number, unique: true },
+    id: { type: String, unique: true },
+    value: { type: Number, unique: false },
     date: { type: Date, unique: false },
-    description: { type: String, unique: true },
+    description: { type: String, unique: false },
   },
   {
     timestamps: true,

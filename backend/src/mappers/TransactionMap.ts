@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Mapper } from '../core/infra/Mapper';
 
@@ -20,7 +21,7 @@ export class TransactionMap extends Mapper<Transaction> {
   }
 
   public static toDomain(transaction: any | Model<ITransactionPersistence & Document>): Transaction {
-    const transactionOrError = Transaction.create(transaction, new UniqueEntityID(transaction.domainId));
+    const transactionOrError = Transaction.create(transaction, new UniqueEntityID(transaction.id));
 
     transactionOrError.isFailure ? console.log(transactionOrError.error) : '';
 
@@ -29,7 +30,7 @@ export class TransactionMap extends Mapper<Transaction> {
 
   public static toPersistence(transaction: Transaction): any {
     return {
-      domainId: transaction.id.toString(),
+      id: transaction.id.toString(),
       value: transaction.value,
       date: transaction.date,
       description: transaction.description,
