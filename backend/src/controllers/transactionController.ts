@@ -57,4 +57,23 @@ export default class TransactionController implements ITransactionController /* 
       return next(e);
     }
   }
+
+  public async deleteTransaction(req: Request, res: Response, next: NextFunction) {
+    try {
+      const transactionOrError = (await this.transactionServiceInstance.deleteTransaction(req.url.substring(1)));
+      return res.status(201).json(transactionOrError).status(200);
+    } catch (e) {
+      return next(e);
+    }
+  }
+
+  public async deleteAll(req: Request, res: Response, next: NextFunction) {
+    try {
+      const transaction = await this.transactionServiceInstance.deleteTransactions();
+      return res.json( transaction ).status(200);
+    }
+    catch (e) {
+      return next(e);
+    }
+  }
 }

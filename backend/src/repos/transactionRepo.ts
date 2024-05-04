@@ -2,11 +2,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Service, Inject } from 'typedi';
-
+import { Result } from "../core/logic/Result";
 import ITransactionRepo from '../services/IRepos/ITransactionRepo';
 import { Transaction } from '../domain/transaction';
 import { TransactionId } from '../domain/transactionId';
 import { TransactionMap } from '../mappers/TransactionMap';
+import ITransactionDTO from '../dto/ITransactionDTO'
 
 import { Document, FilterQuery, Model } from 'mongoose';
 import { ITransactionPersistence } from '../dataschema/ITransactionPersistence';
@@ -72,6 +73,24 @@ export default class TransactionRepo implements ITransactionRepo {
   public async findAll() {
     try {
       return await this.transactionSchema.find();
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  public async deleteOne(transaction: Transaction) {
+    try {
+      const criteria = { id: transaction.id };
+      console.log("criteria:   ", criteria);
+      return await this.transactionSchema.deleteOne(criteria);
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  public async deleteAll() {
+    try {
+      return await this.transactionSchema.deleteMany();
     } catch (e) {
       throw e;
     }

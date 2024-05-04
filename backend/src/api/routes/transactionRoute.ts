@@ -39,4 +39,6 @@ export default (app: Router) => {
   );
 
   route.get('', (req, res, next) => ctrl.getTransactions(req, res, next));
+  route.delete('/:id', (req, res, next) => ctrl.deleteTransaction(req, res, next));
+  route.delete('', (req, res, next) => ctrl.deleteAll(req, res, next));
 };

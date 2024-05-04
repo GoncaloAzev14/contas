@@ -75,4 +75,25 @@ export default class TransactionService implements ITransactionService {
       throw e;
     }
   }
+
+  public async deleteTransaction(transactionId: string): Promise<ITransactionDTO> {
+    try {
+      const transactionToDelete = await this.transactionRepo.findByDomainId(transactionId);
+      if (transactionToDelete === null) return null;
+
+      const transactions = await this.transactionRepo.deleteOne(transactionToDelete);
+      return transactions;
+    } catch (e) {
+      throw e;
+    }
+  }
+
+  public async deleteTransactions(): Promise<Result<ITransactionDTO>> {
+    try {
+      const transactions = await this.transactionRepo.deleteAll();
+      return transactions;
+    } catch (e) {
+      throw e;
+    }
+  }
 }
