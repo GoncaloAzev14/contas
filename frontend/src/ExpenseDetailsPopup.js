@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import './ExpenseDetailsPopup.css';
 
-function ExpenseDetailsPopup({ expense, onClose, onUpdateTransaction }) {
+function ExpenseDetailsPopup({ expense, onClose, onUpdateTransaction, onDeleteData }) {
     const [isEditing, setIsEditing] = useState(false); // Estado para controlar se o usuário está editando a transação
     const [updatedExpense, setUpdatedExpense] = useState({
         ...expense,
         date: new Date(expense.date).toISOString().split('T')[0] // Formata a data para 'yyyy-MM-dd'
     }); // Estado local para armazenar a transação atualizada
+    
 
     const handleEditClick = () => {
         setIsEditing(true); // Define isEditing como true quando o usuário clicar em "Editar"
@@ -21,6 +22,11 @@ function ExpenseDetailsPopup({ expense, onClose, onUpdateTransaction }) {
     const handleConfirmClick = () => {
         onUpdateTransaction(updatedExpense); // Chama a função para atualizar a transação com os dados atualizados
         onClose(); // Fecha o popup após a edição
+    };
+
+    const handleUndoClick = () => {
+        onDeleteData(expense.id); // Chama a função para excluir a transação
+        onClose(); // Fecha o popup após a exclusão
     };
 
     const handleChange = (e) => {
@@ -76,6 +82,7 @@ function ExpenseDetailsPopup({ expense, onClose, onUpdateTransaction }) {
                         <p>Data: {new Date(expense.date).toLocaleDateString()}</p>
                         {/* Botão para editar a transação */}
                         <button onClick={handleEditClick}>Editar</button>
+                        <button onClick={handleUndoClick}>Desfazer</button>
                     </>
                 )}
                 <button className="close-button" onClick={onClose}>Fechar</button>

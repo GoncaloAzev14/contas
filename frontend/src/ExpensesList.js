@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import ExpenseDetailsPopup from './ExpenseDetailsPopup';
 
-function ExpensesList({ expenses, onUpdateTransaction }) {
+function ExpensesList({ expenses, onUpdateTransaction, onDeleteData }) {
     const [selectedExpense, setSelectedExpense] = useState(null);
 
     const handleExpenseClick = (expense) => {
@@ -28,6 +28,7 @@ function ExpensesList({ expenses, onUpdateTransaction }) {
                     expense={selectedExpense}
                     onUpdateTransaction={onUpdateTransaction}
                     onClose={handleClosePopup}
+                    onDeleteData={onDeleteData}
                 />
             )}
         </div>

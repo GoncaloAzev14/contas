@@ -152,6 +152,45 @@ function App() {
         }
     };
 
+    const handleDeleteAllData = async () => {
+        try {
+            const response = await fetch(BASE_API_URL + 'transaction/', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                setExpenses([]);
+            } else {
+                console.error('Erro ao excluir todos os dados:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Erro ao excluir todos os dados:', error);
+        }
+    };
+
+    const handleDeleteData = async (id) => {
+        try {
+            const response = await fetch(BASE_API_URL + 'transaction/' + id, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (response.ok) {
+                setExpenses(prevExpenses => prevExpenses.filter(expense => expense.id !== id));
+            } else {
+                console.error('Erro ao excluir todos os dados:', response.statusText);
+            }
+        } catch (error) {
+            console.error('Erro ao excluir todos os dados:', error);
+        }
+    };
+
+
     return (
         <div className="app-container">
             <div className="total-display">
@@ -165,7 +204,9 @@ function App() {
 
             <ChangeTotal onChangeTotal={handleChangeTotal} />
 
-            <ExpensesList expenses={expenses} onUpdateTransaction={handleUpdateTransaction} />
+            <ExpensesList expenses={expenses} onUpdateTransaction={handleUpdateTransaction} onDeleteData={handleDeleteData} />
+
+            <button onClick={handleDeleteAllData}>Limpar Todo o Histórico</button>
         </div>
     );
 }
